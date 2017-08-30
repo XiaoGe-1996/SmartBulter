@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">每日一逛</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="text_setting">设置</string>
+
+    <string name="title_1">服务管家</string>
+    <string name="title_2">微信精选</string>
+    <string name="title_3">美女图片</string>
+    <string name="title_4">个人中心</string>
+    <string name="text_login">登录</string>
+    <string name="text_register">注册</string>
+
+    <string name="text_editor_password">修改密码</string>
+    <string name="text_now_password">旧密码</string>
+    <string name="text_new_password">新密码</string>
+    <string name="text_password_again">再次输入</string>
+    <string name="text_forget_password">忘记密码</string>
+    <string name="text_email">邮箱</string>
+    <string name="courier_title">物流查询</string>
+    <string name="phone">归属地查询</string>
+
+</resources>

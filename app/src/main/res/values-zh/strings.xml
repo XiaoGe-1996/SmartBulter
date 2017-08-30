@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">每日一逛</string>
+    <string name="title_1">服务管家</string>
+    <string name="title_2">微信精选</string>
+    <string name="title_3">美女图片</string>
+    <string name="title_4">个人中心</string>
+    <string name="text_setting">设置</string>
+</resources>

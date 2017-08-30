@@ -5,13 +5,11 @@
     android:padding="10dp">
 
     <EditText
-        android:text="yt"
         android:hint="快递公司"
         android:id="@+id/et_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <EditText
-        android:text="886006933467531210"
         android:hint="快递单号"
         android:id="@+id/et_number"
         android:layout_width="match_parent"
@@ -29,5 +27,5 @@
         android:id="@+id/mRecyclerView"
         android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp"></android.support.v7.widget.RecyclerView>
+        android:layout_height="0dp"/>
 </LinearLayout>

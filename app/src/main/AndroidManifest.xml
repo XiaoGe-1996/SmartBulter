@@ -83,6 +83,10 @@
         <activity
             android:name=".ui.LoginActivity"
             android:label="@string/text_login" />
+        <!--忘记密码界面-->
+        <activity
+            android:name=".ui.ForgetPasswordActivity"
+            android:label="@string/forgetpwd" />
 
         <!--注册界面-->
         <activity

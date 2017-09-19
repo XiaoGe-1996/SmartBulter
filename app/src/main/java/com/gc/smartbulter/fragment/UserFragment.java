@@ -1,14 +1,20 @@
 package com.gc.smartbulter.fragment;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gc.smartbulter.R;
 import com.gc.smartbulter.entity.MyUser;
@@ -30,6 +37,8 @@ import com.gc.smartbulter.utils.UtilTools;
 import com.gc.smartbulter.view.CustomDialog;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
@@ -56,6 +65,10 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     private Button btn_cancel;
     private TextView tv_courier;
     private TextView tv_phone;
+
+    public static File tempFile;
+    public static final int REQUEST_CODE_WRITE = 9;
+    public static final int REQUEST_CODE_CAMERA = 10;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -219,16 +232,62 @@ public class UserFragment extends Fragment implements View.OnClickListener {
     //跳转相机
     private void toCamera() {
 
+        permission(Manifest.permission.WRITE_EXTERNAL_STORAGE,REQUEST_CODE_WRITE);
 //        CameraUtil.openCamera(getActivity());
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        //判断内存卡是否可用,可以的话进行储存
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), StaticClass.PHOTO_IMAGE_FILE_NAME)));
-        startActivityForResult(intent,StaticClass.CAMERA_REQUEST_CODE);
-
         dialog.dismiss();
     }
 
-    private File tempFile =null;
+    public void permission(String permision, int code) {
+        String[] permissions = {permision};
+        //验证是否许可权限
+        if (ContextCompat.checkSelfPermission(getContext(), permision) != PackageManager.PERMISSION_GRANTED) {
+            //申请权限
+            UserFragment.this.requestPermissions(permissions, code);
+        }else {
+            if (code == REQUEST_CODE_WRITE){
+                permission(Manifest.permission.CAMERA,REQUEST_CODE_CAMERA);
+            }
+            if (code == REQUEST_CODE_CAMERA){
+                //申请权限
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                //判断内存卡是否可用,可以的话进行储存
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), StaticClass.PHOTO_IMAGE_FILE_NAME)));
+                startActivityForResult(intent,StaticClass.CAMERA_REQUEST_CODE);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_WRITE:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 权限被用户同意，可以做你要做的事情了。
+                    permission(Manifest.permission.CAMERA,REQUEST_CODE_CAMERA);
+                } else {
+                    // 权限被用户拒绝了，可以提示用户,关闭界面等等。
+                    UtilTools.showShrotToast(getContext(),"没有权限不能打开相机");
+                }
+                return;
+            }
+
+            case REQUEST_CODE_CAMERA:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // 权限被用户同意，可以做你要做的事情了。
+                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    //判断内存卡是否可用,可以的话进行储存
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(Environment.getExternalStorageDirectory(), StaticClass.PHOTO_IMAGE_FILE_NAME)));
+                    startActivityForResult(intent,StaticClass.CAMERA_REQUEST_CODE);
+                } else {
+                    // 权限被用户拒绝了，可以提示用户,关闭界面等等。
+                    UtilTools.showShrotToast(getContext(),"没有权限不能打开相机");
+                }
+                break;
+
+
+        }
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
@@ -294,4 +353,45 @@ public class UserFragment extends Fragment implements View.OnClickListener {
         UtilTools.putImageToShare(getActivity(),profile_image);
 
     }
+
+//    /**
+//     * 打开相机拍照
+//     *
+//     * @param activity
+//     */
+//    public void openCamera(Activity activity) {
+//        //獲取系統版本
+//        int currentapiVersion = android.os.Build.VERSION.SDK_INT;
+//        // 激活相机
+//        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//        // 判断存储卡是否可以用，可用进行存储
+//        if (hasSdcard()) {
+//            SimpleDateFormat timeStampFormat = new SimpleDateFormat(
+//                    "yyyy_MM_dd_HH_mm_ss");
+//            String filename = timeStampFormat.format(new Date());
+//            tempFile = new File(Environment.getExternalStorageDirectory(),
+//                    filename + ".jpg");
+//            if (currentapiVersion < 24) {
+//                // 从文件中创建uri
+//                Uri uri = Uri.fromFile(tempFile);
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+//            } else {
+//                //兼容android7.0 使用共享文件的形式
+//                ContentValues contentValues = new ContentValues(1);
+//                contentValues.put(MediaStore.Images.Media.DATA, tempFile.getAbsolutePath());
+//                Uri uri = getActivity().getApplication().getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+//                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+//            }
+//        }
+//        // 开启一个带有返回值的Activity，请求码为PHOTO_REQUEST_CAREMA
+//        getActivity().startActivityForResult(intent, StaticClass.CAMERA_REQUEST_CODE);
+//    }
+//
+//    /*
+//  * 判断sdcard是否被挂载
+//  */
+//    public static boolean hasSdcard() {
+//        return Environment.getExternalStorageState().equals(
+//                Environment.MEDIA_MOUNTED);
+//    }
 }

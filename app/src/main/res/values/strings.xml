@@ -20,5 +20,6 @@
     <string name="text_email">邮箱</string>
     <string name="courier_title">物流查询</string>
     <string name="phone">归属地查询</string>
+    <string name="forgetpwd">忘记密码</string>
 
 </resources>

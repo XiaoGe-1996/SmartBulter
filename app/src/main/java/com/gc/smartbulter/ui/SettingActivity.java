@@ -22,11 +22,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 
 import com.gc.smartbulter.R;
+import com.gc.smartbulter.fragment.UserFragment;
 import com.gc.smartbulter.service.SmsService;
 import com.gc.smartbulter.utils.ShareUtils;
+import com.gc.smartbulter.utils.UtilTools;
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
+import static com.gc.smartbulter.R.id.cancel_action;
 import static com.gc.smartbulter.R.id.tv_scan_result;
 
 /**
@@ -127,9 +130,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
                  */
                 break;
             case R.id.ll_scan:
-                Intent intent = new Intent(this, CaptureActivity.class);
-//                startActivityForResult(intent, REQUEST_CODE);
-                startActivity(intent);
+                permission(Manifest.permission.CAMERA, UserFragment.REQUEST_CODE_CAMERA);
                 break;
 
             case R.id.ll_qr_code:
@@ -139,7 +140,6 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
 
             case R.id.ll_my_location:
                 permission(Manifest.permission.ACCESS_FINE_LOCATION, REQUEST_CODE_CONTACT_TWO);
-                startActivity(new Intent(this,LocationActivity.class));
                 break;
 
         }
@@ -163,12 +163,36 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         if (ContextCompat.checkSelfPermission(this, permision) != PackageManager.PERMISSION_GRANTED) {
             //申请权限
             ActivityCompat.requestPermissions(this, permissions, code);
+        }else {
+            if (code == UserFragment.REQUEST_CODE_CAMERA){
+                Intent intent = new Intent(this, CaptureActivity.class);
+                startActivity(intent);
+            }
+            if (code == REQUEST_CODE_CONTACT_TWO){
+                startActivity(new Intent(this,LocationActivity.class));
+            }
         }
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case UserFragment.REQUEST_CODE_CAMERA:
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    Intent intent = new Intent(this, CaptureActivity.class);
+                    startActivity(intent);
+                }else {
+                    UtilTools.showShrotToast(getApplicationContext(),"没有权限，不能扫一扫");
+                }
+                break;
+            case REQUEST_CODE_CONTACT_TWO :
+                if (grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                    startActivity(new Intent(this,LocationActivity.class));
+                }else {
+                    UtilTools.showShrotToast(getApplicationContext(),"没有权限，不能打开定位");
+                }
+                break;
+        }
     }
 
     //申请特殊权限
